@@ -13,8 +13,20 @@ async function getEditEntryForm() {
     body: new URLSearchParams(body),
   });
   const data = await response.text();
-
   console.log(data);
+  // const data = await response.json();
+
+  // if (data) {
+  //   for (let item of data.entry_fields) {
+
+  //     const parser = new DOMParser();
+  //     const htmlDocument = parser.parseFromString(item.xml_content, "text/html");
+  //     const section = htmlDocument.documentElement.querySelector(
+  //       "#wpforms-edit-entry-form"
+  //     );
+  //     console.log(section);
+  //   }
+  // }
 }
 
 document.addEventListener("DOMContentLoaded", async function (event) {
