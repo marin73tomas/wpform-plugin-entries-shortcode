@@ -1,0 +1,5 @@
+
+.whe-edit .wpforms-frontend-entries tbody tr:hover {
+     cursor: pointer;
+     background-color: rgb(231, 231, 231);
+}

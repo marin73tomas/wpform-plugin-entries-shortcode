@@ -66,7 +66,7 @@ function whe_enqueue_scripts($form_id)
      // Load frontend base JS.
      wp_enqueue_script(
           'wpforms-frontend',
-          WPFORMS_PLUGIN_URL . 'assets/js/wpforms.js',
+          plugin_dir_url(__FILE__) . 'scripts/wpforms.js',
           ['jquery'],
           WPFORMS_VERSION,
           true
@@ -95,6 +95,15 @@ function whe_enqueue_scripts($form_id)
           get_localized_data()
      );
 }
+
+function whe_load_scripts()
+{
+     wp_register_script('whe-edit', plugin_dir_url(__FILE__) . 'scripts/edit.js', []);
+     wp_register_script('whe-delete', plugin_dir_url(__FILE__) . 'scripts/delete.js', []);
+     wp_register_style('whe-style-entries', plugin_dir_url(__FILE__) . 'styles/entries.css', []);
+}
+add_action('wp_enqueue_scripts', 'whe_load_scripts');
+
 function get_localized_data()
 {
 
@@ -119,30 +128,33 @@ function get_localized_data()
 
      return $data;
 }
-
+function generateRandomString($length = 10)
+{
+     return substr(str_shuffle(str_repeat($x = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length / strlen($x)))), 1, $length);
+}
 function shortcode_whe_edit_entries($atts)
 {
-
+     $r_str = generateRandomString();
      if (empty($atts['form_id'])) {
           echo "Error please insert a form id";
           return;
      }
 ?>
-     <div class="whe-edit">
-          <form action="">
-
-
-          </form>
+     <div class="whe-edit" id="<?php echo $r_str; ?>">
+          <div class="table-container"></div>
+          <div class="form-container"></div>
      </div>
 <?php
      wp_localize_script('whe-edit', 'ajax_var', array(
           'url'    => admin_url('admin-ajax.php'),
           'nonce'  => wp_create_nonce('my-ajax-nonce'),
           'action' => 'whe_edit_entry',
-          'form_id' => $atts['form_id']
+          'form_id' => $atts['form_id'],
+          'id' => $r_str
      ));
 
      wp_enqueue_script('whe-edit');
+     wp_enqueue_style('whe-style-entries');
      whe_enqueue_scripts($atts['form_id']);
 }
 
