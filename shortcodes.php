@@ -66,7 +66,7 @@ function whe_enqueue_scripts($form_id)
      // Load frontend base JS.
      wp_enqueue_script(
           'wpforms-frontend',
-          plugin_dir_url(__FILE__) . 'scripts/wpforms.js',
+          plugin_dir_url(__FILE__) . 'scripts/customwpforms.js',
           ['jquery'],
           WPFORMS_VERSION,
           true

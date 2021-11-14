@@ -865,7 +865,7 @@ class  Whe_Custom_Edit
 
           // Existing entry fields data.
           $this->entry_fields = apply_filters('wpforms_pro_admin_entries_edit_existing_entry_fields', wpforms_decode($this->entry->fields), $this->entry, $this->form_data);
-
+  
           // Pre-process/validate hooks and filter.
           // Data is not validated or cleaned yet so use with caution.
           $entry = apply_filters('wpforms_pro_admin_entries_edit_process_before_filter', $entry, $this->form_data);

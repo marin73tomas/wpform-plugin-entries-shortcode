@@ -18,7 +18,8 @@ if (!defined('ABSPATH')) {
      exit; // Exit if accessed directly.
 }
 
-
+include_once('custom-class-form.php');
+//include_once('custom_wp_form.php');
 include_once("submit.php");
 //include_once("edit.php");
 include_once("ajax.php");

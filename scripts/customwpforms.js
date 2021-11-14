@@ -2427,7 +2427,12 @@ var wpforms =
         app.clearFormAjaxGeneralErrors($form);
 
         formData = new FormData($form.get(0));
-        formData.append("action", "whe_ajax_submit");
+        console.log($form);
+        const action =
+          $form.id == "wpforms-edit-entry-form"
+            ? "whe_ajax_submit"
+            : "wpforms_submit";
+        formData.append("action", action);
         formData.append("page_url", window.location.href);
 
         args = {

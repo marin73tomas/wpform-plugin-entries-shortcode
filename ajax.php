@@ -97,9 +97,11 @@ function load_entry_form()
 
           return;
      }
-
+     $custom_wpforms = new Custom_WPForms_Form_Handler();
      // Find the form information.
-     $form = wpforms()->form->get($entry->form_id, ['cap' => 'view_entries_form_single']);
+     $form = $custom_wpforms->get($entry->form_id, ['cap' => 'view_entries_form_single']);
+
+    // print_r($form);
 
      // Form details.
      $form_data      = wpforms_decode($form->post_content);
@@ -186,148 +188,7 @@ function load_entry_form()
                ]
           );
      }
-
-?>
-     <div id="wpforms-entries-single" class="wrap wpforms-admin-wrap">
-
-          <h1 class="page-title">
-
-               <?php esc_html_e('View Entry', 'wpforms'); ?>
-
-               <?php
-
-
-               $form_data = wpforms_decode($form->post_content);
-               ?>
-
-               <a href="<?php echo esc_url($form->form_url); ?>" class="add-new-h2 wpforms-btn-orange"><?php esc_html_e('Back to All Entries', 'wpforms'); ?></a>
-
-               <div class="wpforms-entry-navigation">
-                    <span class="wpforms-entry-navigation-text">
-                         <?php
-                         printf(
-                              /* translators: %1$s - current number of entry; %2$s - total number of entries. */
-                              esc_html__('Entry %1$s of %2$s', 'wpforms'),
-                              $entry->entry_prev_count + 1,
-                              $entry->entry_count
-                         );
-                         ?>
-                    </span>
-                    <span class="wpforms-entry-navigation-buttons">
-                         <a href="<?php echo esc_url($entry->entry_prev_url); ?>" title="<?php esc_attr_e('Previous form entry', 'wpforms'); ?>" id="wpforms-entry-prev-link" class="add-new-h2 wpforms-btn-grey <?php echo $entry->entry_prev_class; ?>">
-                              <span class="dashicons dashicons-arrow-left-alt2"></span>
-                         </a>
-
-                         <span class="wpforms-entry-current" title="<?php esc_attr_e('Current form entry', 'wpforms'); ?>"><?php echo $entry->entry_prev_count + 1; ?></span>
-
-                         <a href="<?php echo esc_url($entry->entry_next_url); ?>" title="<?php esc_attr_e('Next form entry', 'wpforms'); ?>" id="wpforms-entry-next-link" class=" add-new-h2 wpforms-btn-grey <?php echo $entry->entry_next_class; ?>">
-                              <span class="dashicons dashicons-arrow-right-alt2"></span>
-                         </a>
-                    </span>
-               </div>
-
-          </h1>
-
-          <div class="wpforms-admin-content">
-
-               <div id="poststuff">
-
-                    <div id="post-body" class="metabox-holder columns-2">
-
-                         <!-- Left column -->
-                         <div id="post-body-content" style="position: relative;">
-                              <?php
-                              $hide_empty = isset($_COOKIE['wpforms_entry_hide_empty']) && 'true' === $_COOKIE['wpforms_entry_hide_empty'];
-                              $form_title = !isset($form_data['settings']['form_title']) ? $form_data['settings']['form_title'] : '';
-
-                              if (empty($form_title)) {
-                                   $form = wpforms()->get('form')->get($entry->form_id);
-
-                                   $form_title = !empty($form)
-                                        ? $form->post_title
-                                        : sprintf( /* translators: %d - form id. */
-                                             esc_html__('Form (#%d)', 'wpforms'),
-                                             $entry->form_id
-                                        );
-                              }
-                              ?>
-                              <!-- Entry Fields metabox -->
-                              <div id="wpforms-entry-fields" class="postbox">
-
-                                   <div class="postbox-header">
-                                        <h2 class="hndle">
-                                             <?php echo '1' === (string) $entry->starred ? '<span class="dashicons dashicons-star-filled"></span>' : ''; ?>
-                                             <span><?php echo esc_html($form_title); ?></span>
-                                             <a href="#" class="wpforms-empty-field-toggle">
-                                                  <?php echo $hide_empty ? esc_html__('Show Empty Fields', 'wpforms') : esc_html__('Hide Empty Fields', 'wpforms'); ?>
-                                             </a>
-                                        </h2>
-                                   </div>
-
-                                   <div class="inside">
-
-                                        <?php
-                                        $fields = apply_filters('wpforms_entry_single_data', wpforms_decode($entry->fields), $entry, $form_data);
-
-                                        if (empty($fields)) {
-
-                                             // Whoops, no fields! This shouldn't happen under normal use cases.
-                                             echo '<p class="no-fields">' . esc_html__('This entry does not have any fields', 'wpforms') . '</p>';
-                                        } else {
-
-                                             // Display the fields and their values
-                                             foreach ($fields as $key => $field) {
-
-                                                  // We can't display the field of unknown type.
-                                                  if (empty($field['type'])) {
-                                                       continue;
-                                                  }
-
-                                                  $field_value  = isset($field['value']) ? $field['value'] : '';
-                                                  $field_value  = apply_filters('wpforms_html_field_value', wp_strip_all_tags($field_value), $field, $form_data, 'entry-single');
-                                                  $field_class  = sanitize_html_class('wpforms-field-' . $field['type']);
-                                                  $field_class .= wpforms_is_empty_string($field_value) ? ' empty' : '';
-                                                  $field_style  = $hide_empty && empty($field_value) ? 'display:none;' : '';
-
-                                                  echo '<div class="wpforms-entry-field ' . $field_class . '" style="' . $field_style . '">';
-
-                                                  // Field name
-                                                  echo '<p class="wpforms-entry-field-name">';
-                                                  /* translators: %d - field ID. */
-                                                  echo !empty($field['name']) ? wp_strip_all_tags($field['name']) : sprintf(esc_html__('Field ID #%d', 'wpforms'), absint($field['id']));
-                                                  echo '</p>';
-
-                                                  // Field value
-                                                  echo '<div class="wpforms-entry-field-value">';
-                                                  echo !wpforms_is_empty_string($field_value) ? nl2br(make_clickable($field_value)) : esc_html__('Empty', 'wpforms');
-                                                  echo '</div>';
-
-                                                  echo '</div>';
-                                             }
-                                        }
-                                        ?>
-
-                                   </div>
-
-                              </div>
-
-                         </div>
-
-                         <!-- Right column -->
-                         <div id="postbox-container-1" class="postbox-container">
-
-                         </div>
-
-                    </div>
-
-               </div>
-
-          </div>
-
-     </div>
-
-     <?php
-     echo "xd";
+     $form_data = wpforms_decode($form->post_content);
 
      $view_entry_url = add_query_arg(
           [
@@ -351,7 +212,7 @@ function load_entry_form()
           ],
      ];
      $entry_fields = wpforms_decode($entry->fields);
-     ?>
+?>
 
      <div id="wpforms-entries-single" class="wrap wpforms-admin-wrap">
 
@@ -391,6 +252,7 @@ function load_entry_form()
                                    <div class="inside">
 
                                         <?php
+
                                         if (empty($entry_fields)) {
 
                                              // Whoops, no fields! This shouldn't happen under normal use cases.
@@ -399,44 +261,45 @@ function load_entry_form()
 
                                              // Display the fields and their editable values.
                                              $form_id = (int) $form_data['id'];
-
+                                             //print_r($form->post_content);
+                                             //print_r($form_data);
                                              echo '<input type="hidden" name="wpforms[id]" value="' . esc_attr($form_id) . '">';
                                              echo '<input type="hidden" name="wpforms[entry_id]" value="' . esc_attr($entry->entry_id) . '">';
                                              echo '<input type="hidden" name="nonce" value="' . esc_attr(wp_create_nonce('wpforms-entry-edit-' . $form_id . '-' . $entry->entry_id)) . '">';
 
-                                             if (empty($form_data['fields']) || !is_array($form_data['fields'])) {
-                                                  echo '<div class="wpforms-edit-entry-field empty">';
-                                                  echo '<p class="wpforms-entry-field-value">';
+                                             // if (empty($form_data['fields']) || !is_array($form_data['fields'])) {
+                                             //      echo '<div class="wpforms-edit-entry-field empty">';
+                                             //      echo '<p class="wpforms-entry-field-value">';
 
-                                                  if (\wpforms_current_user_can('edit_form_single', $form_data['id'])) {
-                                                       $edit_url = add_query_arg(
-                                                            array(
-                                                                 'page'    => 'wpforms-builder',
-                                                                 'view'    => 'fields',
-                                                                 'form_id' => absint($form_data['id']),
-                                                            ),
-                                                            admin_url('admin.php')
-                                                       );
-                                                       printf(
-                                                            wp_kses( /* translators: %s - form edit URL. */
-                                                                 __('You don\'t have any fields in this form. <a href="%s">Add some!</a>', 'wpforms'),
-                                                                 [
-                                                                      'a' => [
-                                                                           'href' => [],
-                                                                      ],
-                                                                 ]
-                                                            ),
-                                                            esc_url($edit_url)
-                                                       );
-                                                  } else {
-                                                       esc_html_e('You don\'t have any fields in this form.', 'wpforms');
-                                                  }
+                                             //      if (\wpforms_current_user_can('edit_form_single', $form_data['id'])) {
+                                             //           $edit_url = add_query_arg(
+                                             //                array(
+                                             //                     'page'    => 'wpforms-builder',
+                                             //                     'view'    => 'fields',
+                                             //                     'form_id' => absint($form_data['id']),
+                                             //                ),
+                                             //                admin_url('admin.php')
+                                             //           );
+                                             //           printf(
+                                             //                wp_kses( /* translators: %s - form edit URL. */
+                                             //                     __('You don\'t have any fields in this form. <a href="%s">Add some!</a>', 'wpforms'),
+                                             //                     [
+                                             //                          'a' => [
+                                             //                               'href' => [],
+                                             //                          ],
+                                             //                     ]
+                                             //                ),
+                                             //                esc_url($edit_url)
+                                             //           );
+                                             //      } else {
+                                             //           esc_html_e('You don\'t have any fields in this form.', 'wpforms');
+                                             //      }
 
-                                                  echo '</p>';
-                                                  echo '</div>';
+                                             //      echo '</p>';
+                                             //      echo '</div>';
 
-                                                  return;
-                                             }
+                                             //      return;
+                                             // }
 
                                              foreach ($form_data['fields'] as $field_id => $field) {
                                                   $field_type = !empty($field['type']) ? $field['type'] : '';
@@ -589,8 +452,13 @@ function whe_ajax_process_errors($wp_form, $form_id, $form_data)
 
 function whe_load_edit_entries()
 {
-     @ini_set('display_errors', 1);
+     $custom_wpforms = new Custom_WPForms_Form_Handler();
 
+     @ini_set('display_errors', 1);
+     if (!is_user_logged_in()) {
+          echo "Error: You must be logged in to see your entries.";
+          wp_die();
+     }
      $nonce = sanitize_text_field($_POST['nonce']);
 
      if (!wp_verify_nonce($nonce, 'my-ajax-nonce')) {
@@ -601,7 +469,7 @@ function whe_load_edit_entries()
      $user_id = get_current_user_id();
 
 
-     $form = wpforms()->form->get(absint($form_id));
+     $form = $custom_wpforms->get(absint($form_id));
      if (empty($form)) {
           wp_die("Error, the form could not be found");
      }
