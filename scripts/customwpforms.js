@@ -2427,9 +2427,9 @@ var wpforms =
         app.clearFormAjaxGeneralErrors($form);
 
         formData = new FormData($form.get(0));
-        console.log($form);
+
         const action =
-          $form.id == "wpforms-edit-entry-form"
+          $form[0].id == "wpforms-edit-entry-form"
             ? "whe_ajax_submit"
             : "wpforms_submit";
         formData.append("action", action);

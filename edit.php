@@ -436,9 +436,9 @@ class  Whe_Custom_Edit
                return;
           }
 
-          if (!wpforms_current_user_can('edit_entries_form_single', $form_data['id']) || !wpforms()->get('entry')->has_editable_fields($entry)) {
-               return;
-          }
+          // if (!wpforms_current_user_can('edit_entries_form_single', $form_data['id']) || !wpforms()->get('entry')->has_editable_fields($entry)) {
+          //      return;
+          // }
 
           // Edit Entry URL.
           $edit_url = add_query_arg(

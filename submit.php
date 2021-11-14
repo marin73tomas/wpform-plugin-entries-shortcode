@@ -2,6 +2,7 @@
 
 namespace WPForms\Pro\Admin\Entries;
 
+use Custom_WPForms_Entry_Handler;
 use WPForms\Pro\Forms\Fields\Base\EntriesEdit;
 
 class WPForms_Process_Custom
@@ -140,12 +141,12 @@ class WPForms_Process_Custom
 
      private function process($entry)
      {
-
+          $custom_wpforms = new \Custom_WPForms_Form_Handler();
           // Setup variables.
           $this->fields = [];
           $this->entry  = wpforms()->entry->get($this->entry_id);
           $form_id      = $this->form_id;
-          $this->form   = wpforms()->form->get($this->form_id, ['cap' => 'edit_entries_form_single']);
+          $this->form   = $custom_wpforms->get($this->form_id, ['cap' => 'edit_entries_form_single']);
 
           // Validate form is real.
           if (!$this->form) {
@@ -307,7 +308,7 @@ class WPForms_Process_Custom
      }
      private function process_update()
      {
-
+          $custom_entry = new Custom_WPForms_Entry_Handler();
           // Update entry fields.
           $updated_fields = $this->process_update_fields_data();
 
@@ -321,7 +322,7 @@ class WPForms_Process_Custom
                'fields'        => wp_json_encode($this->get_updated_entry_fields($updated_fields)),
                'date_modified' => $this->date_modified,
           ];
-          wpforms()->entry->update($this->entry_id, $entry_data, '', 'edit_entry', ['cap' => 'edit_entry_single']);
+          $check = $custom_entry->update($this->entry_id, $entry_data, '', 'edit_entry', ['cap' => 'edit_entry_single']);
 
           // Add record to entry meta.
           $this->add_entry_meta(esc_html__('Entry edited.', 'wpforms'));
@@ -336,7 +337,7 @@ class WPForms_Process_Custom
 
           do_action('wpforms_pro_admin_entries_edit_submit_completed', $this->form_data, $response, $updated_fields, $this->entry);
 
-          wp_send_json_success($response);
+          wp_send_json_success(['$response' => $check]);
      }
      private function is_field_entries_editable($type)
      {
@@ -526,7 +527,7 @@ class WPForms_Process_Custom
       */
      public function entry_confirmation_redirect($form_data = array(), $hash = '')
      {
-
+          $custom_wpforms = new \Custom_WPForms_Form_Handler();
           // Maybe process return hash.
           if (!empty($hash)) {
 
@@ -539,7 +540,7 @@ class WPForms_Process_Custom
                $this->valid_hash = true;
                $this->entry_id = absint($hash_data['entry_id']);
                $this->fields = json_decode($hash_data['fields'], true);
-               $this->form_data = wpforms()->form->get(
+               $this->form_data = $custom_wpforms->get(
                     absint($hash_data['form_id']),
                     array(
                          'content_only' => true,
@@ -847,10 +848,24 @@ class WPForms_Process_Custom
 
           wp_send_json_error($response);
      }
+     public function replace_usercan()
+     {
+          return true;
+     }
      public function whe_ajax_submit()
      {
 
-          echo json_encode("culo");
+          $user = wp_get_current_user(); // getting & setting the current user 
+          $roles = (array) $user->roles; // obtaining the role 
+          foreach ($roles as $role) {
+               $role_object = get_role($role);
+
+               // add $cap capability to this role object
+               $role_object->add_cap('wpforms_edit_entries_own_forms');
+               $role_object->add_cap('wpforms_view_entries_others_forms');
+          }
+
+
 
           $this->form_id  = !empty($_POST['wpforms']['id']) ? (int) $_POST['wpforms']['id'] : 0;
           $this->entry_id = !empty($_POST['wpforms']['entry_id']) ? (int) $_POST['wpforms']['entry_id'] : 0;

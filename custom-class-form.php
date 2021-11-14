@@ -66,9 +66,9 @@ class Custom_WPForms_Form_Handler
      public function admin_bar($wp_admin_bar)
      {
 
-          if (!is_admin_bar_showing() || !wpforms_current_user_can('create_forms')) {
-               return;
-          }
+          // if (!is_admin_bar_showing() || !wpforms_current_user_can('create_forms')) {
+          //      return;
+          // }
 
           $args = [
                'id'     => 'wpforms',
@@ -232,10 +232,10 @@ class Custom_WPForms_Form_Handler
 
           foreach ($ids as $id) {
 
-               // Check for permissions.
-               if (!wpforms_current_user_can('delete_form_single', $id)) {
-                    return false;
-               }
+               // // Check for permissions.
+               // if (!wpforms_current_user_can('delete_form_single', $id)) {
+               //      return false;
+               // }
 
                if (class_exists('WPForms_Entry_Handler', false)) {
                     wpforms()->entry->delete_by('form_id', $id);
@@ -274,10 +274,10 @@ class Custom_WPForms_Form_Handler
                return false;
           }
 
-          // Check for permissions.
-          if (!wpforms_current_user_can('create_forms')) {
-               return false;
-          }
+          // // Check for permissions.
+          // if (!wpforms_current_user_can('create_forms')) {
+          //      return false;
+          // }
 
           // This filter breaks forms if they contain HTML.
           remove_filter('content_save_pre', 'balanceTags', 50);
@@ -315,10 +315,10 @@ class Custom_WPForms_Form_Handler
 
           $form_id = wp_insert_post($form);
 
-          // If user has no editing permissions the form considered to be created out of the WPForms form builder's context.
-          if (!wpforms_current_user_can('edit_form_single', $form_id)) {
-               $data['builder'] = false;
-          }
+          // // If user has no editing permissions the form considered to be created out of the WPForms form builder's context.
+          // if (!wpforms_current_user_can('edit_form_single', $form_id)) {
+          //      $data['builder'] = false;
+          // }
 
           // If the form is created outside the context of the WPForms form
           // builder, then we define some additional default values.
@@ -381,9 +381,9 @@ class Custom_WPForms_Form_Handler
                $args['cap'] = 'edit_form_single';
           }
 
-          if (!empty($args['cap']) && !wpforms_current_user_can($args['cap'], $form_id)) {
-               return false;
-          }
+          // if (!empty($args['cap']) && !wpforms_current_user_can($args['cap'], $form_id)) {
+          //      return false;
+          // }
 
           // This filter breaks forms if they contain HTML.
           remove_filter('content_save_pre', 'balanceTags', 50);
@@ -500,10 +500,10 @@ class Custom_WPForms_Form_Handler
      public function duplicate($ids = [])
      {
 
-          // Check for permissions.
-          if (!wpforms_current_user_can('create_forms')) {
-               return false;
-          }
+          // // check for permissions.
+          // if (!wpforms_current_user_can('create_forms')) {
+          //      return false;
+          // }
 
           // Add filter of the link rel attr to avoid JSON damage.
           add_filter('wp_targeted_link_rel', '__return_empty_string', 50, 1);
@@ -522,10 +522,10 @@ class Custom_WPForms_Form_Handler
                // Get original entry.
                $form = get_post($id);
 
-               if (!wpforms_current_user_can('view_form_single', $id)) {
-                    return false;
-               }
-
+               // if (!wpforms_current_user_can('view_form_single', $id)) {
+               //      return false;
+               // }
+                    
                // Confirm form exists.
                if (!$form || empty($form)) {
                     return false;
