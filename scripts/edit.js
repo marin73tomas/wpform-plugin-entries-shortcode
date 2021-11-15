@@ -530,6 +530,57 @@ async function getEditEntryForm() {
               formContainer.style.display = "block";
               spinner.style.display = "none";
               applyEvents();
+              // creates multiple instances
+              flatpickr(".wpforms-field-date-time-date");
+              container.querySelectorAll(".wpforms-datepicker-clear").forEach(
+                (e) =>
+                  (e.onclick = function () {
+                    if (
+                      e.previousElementSibling &&
+                      e.previousElementSibling.tagName == "input"
+                    )
+                      e.previousElementSibling.value = "";
+                  })
+              );
+              const submitDelete = container.querySelector(".submitdelete");
+
+              if (submitDelete) {
+                submitDelete.onclick = async function (e) {
+                  e.preventDefault();
+                  Swal.fire({
+                    title: "Are you sure you want to delete this entry?",
+                    showDenyButton: true,
+                    showCancelButton: false,
+                    confirmButtonText: "Yes",
+                    denyButtonText: `No`,
+                  }).then(async (result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                      const dbody2 = {
+                        action: "whe_delete_entry",
+                        nonce: ajax_var.nonce,
+                      };
+                      const dresponse2 = await fetch(ajax_var.url, {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: new URLSearchParams({
+                          entry_id: item.className.split("eid-")[1],
+                          ...dbody2,
+                        }),
+                      });
+                      const ddata2 = await dresponse2.text();
+                      if (ddata2) {
+                        console.log(ddata2);
+                        reloadBtn.click()
+                      }
+                    } else if (result.isDenied) {
+                      Swal.close();
+                    }
+                  });
+                };
+              }
             }
           });
         }
@@ -566,6 +617,56 @@ async function getEditEntryForm() {
           formContainer.style.display = "block";
           spinner.style.display = "none";
           applyEvents();
+          flatpickr(".wpforms-field-date-time-date");
+          container.querySelectorAll(".wpforms-datepicker-clear").forEach(
+            (e) =>
+              (e.onclick = function () {
+                if (
+                  e.previousElementSibling &&
+                  e.previousElementSibling.tagName == "input"
+                )
+                  e.previousElementSibling.value = "";
+              })
+          );
+          const submitDelete = container.querySelector(".submitdelete");
+
+          if (submitDelete) {
+            submitDelete.onclick = async function (e) {
+              e.preventDefault();
+              Swal.fire({
+                title: "Are you sure you want to delete this entry?",
+                showDenyButton: true,
+                showCancelButton: false,
+                confirmButtonText: "Yes",
+                denyButtonText: `No`,
+              }).then(async (result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                  const dbody2 = {
+                    action: "whe_delete_entry",
+                    nonce: ajax_var.nonce,
+                  };
+                  const dresponse2 = await fetch(ajax_var.url, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: new URLSearchParams({
+                      entry_id: item.className.split("eid-")[1],
+                      ...dbody2,
+                    }),
+                  });
+                  const ddata2 = await dresponse2.text();
+                  if (ddata2) {
+                    console.log(ddata2);
+                    reloadBtn.click();
+                  }
+                } else if (result.isDenied) {
+                  Swal.close();
+                }
+              });
+            };
+          }
         }
       });
     }
@@ -574,7 +675,11 @@ async function getEditEntryForm() {
 
 document.addEventListener("DOMContentLoaded", async function (event) {
   const formSetUp = await getEditEntryForm();
-  document.body.removeChild(document.querySelector("#wpforms-js"));
-  const clone = document.querySelector("#wpforms-frontend-js").cloneNode();
-  document.body.appendChild(clone);
+  try {
+    document.body.removeChild(document.querySelector("#wpforms-js"));
+    const clone = document.querySelector("#wpforms-frontend-js").cloneNode();
+    document.body.appendChild(clone);
+  } catch (error) {
+    console.log(error);
+  }
 });

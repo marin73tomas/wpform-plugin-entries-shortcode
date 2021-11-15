@@ -4,12 +4,29 @@ use WPForms\Pro\Forms\Fields\Base\EntriesEdit;
 
 add_action("wp_ajax_edit_entry", "edit_entry");
 add_action("wp_ajax_nopriv_edit_entry", "edit_entry");
-add_action("wp_ajax_delete_entry", "delete_entry");
-add_action("wp_ajax_nopriv_delete_entry", "delete_entry");
 
 add_action("wp_ajax_load_edit_entries", "whe_load_edit_entries");
 add_action("wp_ajax_nopriv_load_edit_entries", "whe_load_edit_entries");
+add_action("wp_ajax_whe_delete_entry", "whe_delete_entry");
+add_action("wp_ajax_nopriv_whe_delete_entry", "whe_delete_entry");
 
+function whe_delete_entry()
+{
+     $nonce = sanitize_text_field($_POST['nonce']);
+     if (!wp_verify_nonce($nonce, 'my-ajax-nonce')) {
+          die('Busted!');
+     }
+     $entry = wpforms()->entry->get(absint($_POST['entry_id'])); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+     if ($entry->user_id == get_current_user_id()) {
+
+          $custom_handler = new Custom_WPForms_Entry_Handler();
+          $form =  $custom_handler->delete($_POST['entry_id']);
+     }
+
+
+     echo wp_json_encode(['delete' => $form]);
+     wp_die();
+}
 
 
 
@@ -101,7 +118,7 @@ function load_entry_form()
      // Find the form information.
      $form = $custom_wpforms->get($entry->form_id, ['cap' => 'view_entries_form_single']);
 
-    // print_r($form);
+     // print_r($form);
 
      // Form details.
      $form_data      = wpforms_decode($form->post_content);
@@ -379,6 +396,11 @@ function load_entry_form()
                                    esc_html__('Update', 'wpforms'),
                                    esc_url(WPFORMS_PLUGIN_URL)
                               ); ?>
+                              <div id="delete-action">
+                                   <button class="button button-primary button-large submitdelete deletion">
+                                        <?php esc_html_e('Delete Entry', 'wpforms'); ?>
+                                   </button>
+                              </div>
                          </div>
 
                          </form>
@@ -552,15 +574,4 @@ function whe_load_edit_entries()
      echo '</table>';
      $output = ob_get_clean();
      wp_die($output);
-}
-
-function whe_edit_entry()
-{
-     echo "";
-}
-
-
-function whe_delete_entry()
-{
-     echo "";
 }

@@ -2,7 +2,7 @@
 
 
 add_shortcode("wpforms_edit_entries", "shortcode_whe_edit_entries");
-add_shortcode("wpforms_delete_entries", "shortcode_whe_delete_entries");
+
 
 function whe_enqueue_styles()
 {
@@ -146,7 +146,33 @@ function whe_enqueue_scripts($form_id)
           WPFORMS_VERSION,
           true
      );
+     wp_enqueue_style(
+          'wpforms-jquery-timepicker',
+          WPFORMS_PLUGIN_URL . 'assets/css/jquery.timepicker.css',
+          [],
+          '1.11.5'
+     );
+     wp_enqueue_style(
+          'wpforms-flatpickr',
+          WPFORMS_PLUGIN_URL . 'assets/css/flatpickr.min.css',
+          [],
+          '4.6.9'
+     );
 
+     wp_enqueue_script(
+          'wpforms-flatpickr',
+          WPFORMS_PLUGIN_URL . 'assets/js/flatpickr.min.js',
+          ['jquery'],
+          '4.6.9',
+          true
+     );
+     wp_enqueue_script(
+          'wpforms-jquery-timepicker',
+          WPFORMS_PLUGIN_URL . 'assets/js/jquery.timepicker.min.js',
+          ['jquery'],
+          '1.11.5',
+          true
+     );
      // Localize frontend strings.
      wp_localize_script(
           'wpforms-frontend',
@@ -165,7 +191,8 @@ function whe_enqueue_scripts($form_id)
 function whe_load_scripts()
 {
      wp_register_script('whe-edit', plugin_dir_url(__FILE__) . 'scripts/edit.js', []);
-     wp_register_script('whe-delete', plugin_dir_url(__FILE__) . 'scripts/delete.js', []);
+     wp_register_script('whe-sweetalert', plugin_dir_url(__FILE__) . 'scripts/sweetalert.js', []);
+     
 }
 add_action('wp_enqueue_scripts', 'whe_load_scripts');
 
@@ -205,6 +232,7 @@ function shortcode_whe_edit_entries($atts)
           return;
      }
 ?>
+     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
      <div class="whe-edit" id="<?php echo $r_str; ?>">
           <button style="display:none" class="reload-entries button button-primary button-large"><i class="fas fa-undo-alt"></i> Reload All Entries</button>
           <div class="lds-ellipsis" style="display:none">
@@ -230,12 +258,6 @@ function shortcode_whe_edit_entries($atts)
      wp_enqueue_style('whe-style-entries');
      whe_enqueue_scripts($atts['form_id']);
      wp_enqueue_style('whe-style-entries', plugin_dir_url(__FILE__) . 'styles/entries.css', []);
-}
 
-function shortcode_whe_delete_entries()
-{
-?>
 
-<?php
-     wp_enqueue_script('whe-delete');
 }

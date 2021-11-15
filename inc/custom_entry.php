@@ -173,13 +173,13 @@ class Custom_WPForms_Entry_Handler extends Custom_WPForms_DB
      public function delete($entry_id = 0, $args = [])
      {
 
-          if (!isset($args['cap'])) {
-               $args['cap'] = 'delete_entry_single';
-          }
+          // if (!isset($args['cap'])) {
+          //      $args['cap'] = 'delete_entry_single';
+          // }
 
-          if (!empty($args['cap']) && !wpforms_current_user_can($args['cap'], $entry_id)) {
-               return false;
-          }
+          // if (!empty($args['cap']) && !wpforms_current_user_can($args['cap'], $entry_id)) {
+          //      return false;
+          // }
 
           \WPForms_Field_File_Upload::delete_uploaded_files_from_entry($entry_id);
 

@@ -125,3 +125,14 @@ transform: translate(-50%, -50%);
 top: 50%;
 left: 50%;
 }
+.postbox-container {
+    display: flex;
+    align-items: center;
+}
+div#delete-action button {
+    color: white !important;
+    cursor: pointer !important;
+}
+.swal2-actions button {
+    margin: 0 5px;
+}
