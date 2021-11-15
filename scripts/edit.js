@@ -36,7 +36,7 @@ async function applyEvents() {
        */
       init: function () {
         $(app.ready);
-        console.log("entro2");
+        //console.log("entro2");
       },
 
       /**
@@ -54,7 +54,7 @@ async function applyEvents() {
         app.events();
 
         wpf.initTooltips();
-        console.log("entro");
+        //console.log("entro");
       },
 
       /**
@@ -119,7 +119,7 @@ async function applyEvents() {
        */
       clickUpdateButton: function (event) {
         event.preventDefault();
-        console.log("entro up");
+        //console.log("entro up");
         el.$submitButton.prop("disabled", true);
 
         app.preSubmitActions();
@@ -455,6 +455,9 @@ async function applyEvents() {
 }
 
 async function getEditEntryForm() {
+  const container = document.querySelector(`#${ajax_var.id}`);
+  const spinner = container.querySelector(".lds-ellipsis");
+  spinner.style.display = "block";
   const body = {
     action: "load_edit_entries",
     nonce: ajax_var.nonce,
@@ -469,11 +472,69 @@ async function getEditEntryForm() {
     body: new URLSearchParams(body),
   });
   const data = await response.text();
-  const container = document.querySelector(`#${ajax_var.id}`);
+
   if (data && container) {
-    console.log(data);
-    container.querySelector(".table-container").innerHTML = data;
+    const tableContainer = container.querySelector(".table-container");
+    const reloadBtn = container.querySelector(".reload-entries");
+    tableContainer.innerHTML = data;
+    spinner.style.display = "none";
+    tableContainer.style.display = "block";
     const rows = container.querySelectorAll("tbody tr");
+    const formContainer = container.querySelector(".form-container");
+    reloadBtn.addEventListener("click", async function () {
+      formContainer.style.display = "none";
+      spinner.style.display = "block";
+      reloadBtn.style.display = "none";
+      const rresponse = await fetch(ajax_var.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams(body),
+      });
+      const rdata = await rresponse.text();
+      if (rdata && container) {
+        container.querySelector(".table-container");
+        tableContainer.innerHTML = rdata;
+        spinner.style.display = "none";
+        tableContainer.style.display = "block";
+        const rows = container.querySelectorAll("tbody tr");
+        for (let item of rows) {
+          const body2 = {
+            action: "load_entry_form",
+            nonce: ajax_var.nonce,
+            form_id: ajax_var.form_id,
+            page: "wpforms-entries",
+            view: "edit",
+          };
+          item.addEventListener("click", async function () {
+            tableContainer.style.display = "none";
+            spinner.style.display = "block";
+
+            const response2 = await fetch(ajax_var.url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: new URLSearchParams({
+                entry_id: item.className.split("eid-")[1],
+                ...body2,
+              }),
+            });
+            const data2 = await response2.text();
+
+            if (data2) {
+              reloadBtn.style.display = "block";
+
+              formContainer.innerHTML = data2;
+              formContainer.style.display = "block";
+              spinner.style.display = "none";
+              applyEvents();
+            }
+          });
+        }
+      }
+    });
     for (let item of rows) {
       const body2 = {
         action: "load_entry_form",
@@ -483,6 +544,9 @@ async function getEditEntryForm() {
         view: "edit",
       };
       item.addEventListener("click", async function () {
+        tableContainer.style.display = "none";
+        spinner.style.display = "block";
+
         const response2 = await fetch(ajax_var.url, {
           method: "POST",
           headers: {
@@ -496,7 +560,11 @@ async function getEditEntryForm() {
         const data2 = await response2.text();
 
         if (data2) {
-          container.querySelector(".form-container").innerHTML = data2;
+          reloadBtn.style.display = "block";
+
+          formContainer.innerHTML = data2;
+          formContainer.style.display = "block";
+          spinner.style.display = "none";
           applyEvents();
         }
       });

@@ -1,5 +1,127 @@
-
 .whe-edit .wpforms-frontend-entries tbody tr:hover {
-     cursor: pointer;
-     background-color: rgb(231, 231, 231);
+  cursor: pointer;
+  background-color: rgb(231, 231, 231);
+}
+.lds-ellipsis {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-ellipsis div {
+  position: absolute;
+  top: 33px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: rgb(200, 200, 200);
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds-ellipsis div:nth-child(1) {
+  left: 8px;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+  left: 8px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+  left: 32px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+  left: 56px;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
+}
+#wpforms-entries-single #post-body {
+  margin-right: 0 !important;
+  max-width: 100% !important;
+}
+#wpforms-entries-single #poststuff {
+  min-width: initial !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+#wpforms-entries-single > h1 {
+    display: none !important;
+}
+#wpforms-entries-single #postbox-container-1 {
+    color: transparent;
+}
+#wpforms-edit-entry-update, .reload-entries{
+    color: white !important;
+}
+.reload-entries.button.button-primary.button-large {
+    margin: 15px 0;
+}
+
+#wpforms-entries-single .wpforms-admin-content {
+    padding: 0 !important;
+}
+#wpforms-entry-fields .wpforms-empty-field-toggle {
+    display: none;
+}
+.jconfirm-buttons .btn.btn-default {
+    display: none;
+}
+.jconfirm-box {
+    max-width: 400px;
+    transition-duration: 0.4s;
+    transition-timing-function: cubic-bezier(0.36, 0.55, 0.19, 1);
+    transition-property: all, margin;
+}
+.jconfirm-buttons .btn.btn-default {
+    display: none !important;
+}
+.jconfirm-title-c {
+    display: flex !important;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+.jconfirm-content {
+    text-align: center;
+}
+.jconfirm-buttons {
+    float: none !important;
+    margin: auto !important;
+    display: flex !important;
+    justify-content: center;
+}
+
+.whe-edit{
+     position: relative;
+     min-height: 300px;
+
+}
+.whe-edit .lds-ellipsis {
+position: absolute;
+transform: translate(-50%, -50%);
+top: 50%;
+left: 50%;
 }

@@ -1,8 +1,68 @@
 <?php
 
 
-add_shortcode("wpform_edit_entries", "shortcode_whe_edit_entries");
-add_shortcode("wpform_delete_entries", "shortcode_whe_delete_entries");
+add_shortcode("wpforms_edit_entries", "shortcode_whe_edit_entries");
+add_shortcode("wpforms_delete_entries", "shortcode_whe_delete_entries");
+
+function whe_enqueue_styles()
+{
+
+     wp_enqueue_media();
+
+     $min = wpforms_get_min_suffix();
+
+     // Frontend form base styles.
+     wp_enqueue_style(
+          'wpforms-base',
+          WPFORMS_PLUGIN_URL . 'assets/css/wpforms-base.css',
+          [],
+          WPFORMS_VERSION
+     );
+
+     // Entry Edit styles.
+     wp_enqueue_style(
+          'wpforms-entry-edit',
+          WPFORMS_PLUGIN_URL . "pro/assets/css/entry-edit.css",
+          [],
+          WPFORMS_VERSION
+     );
+     // Entry Edit styles.
+     wp_enqueue_style(
+          'wpforms-frontend-admin',
+          WPFORMS_PLUGIN_URL . "assets/css/admin.css",
+          [],
+          WPFORMS_VERSION
+     );
+     // Entry Edit styles.
+     wp_enqueue_style(
+          'edit-css-frontend',
+          admin_url("css/edit.css"),
+     );
+
+     // jQuery confirm.
+     wp_enqueue_style(
+          'jquery-confirm',
+          WPFORMS_PLUGIN_URL . 'assets/css/jquery-confirm.min.css',
+          array(),
+          '3.3.2'
+     );
+
+     // Minicolors (color picker).
+     wp_enqueue_style(
+          'minicolors',
+          WPFORMS_PLUGIN_URL . 'assets/css/jquery.minicolors.css',
+          array(),
+          '2.2.6'
+     );
+
+     // FontAwesome.
+     wp_enqueue_style(
+          'wpforms-font-awesome',
+          WPFORMS_PLUGIN_URL . 'assets/css/font-awesome.min.css',
+          null,
+          '4.7.0'
+     );
+}
 
 function whe_enqueue_scripts($form_id)
 {
@@ -23,6 +83,12 @@ function whe_enqueue_scripts($form_id)
           }
      }
 
+     wp_enqueue_script(
+          'jquery-confirm',
+          WPFORMS_PLUGIN_URL . 'assets/js/jquery.jquery-confirm.min.js',
+          ['jquery'],
+          '3.3.2'
+     );
      //$min = wpforms_get_min_suffix();
 
      if (wpforms_has_field_setting('input_mask', $form, true)) {
@@ -100,7 +166,6 @@ function whe_load_scripts()
 {
      wp_register_script('whe-edit', plugin_dir_url(__FILE__) . 'scripts/edit.js', []);
      wp_register_script('whe-delete', plugin_dir_url(__FILE__) . 'scripts/delete.js', []);
-     wp_register_style('whe-style-entries', plugin_dir_url(__FILE__) . 'styles/entries.css', []);
 }
 add_action('wp_enqueue_scripts', 'whe_load_scripts');
 
@@ -141,8 +206,16 @@ function shortcode_whe_edit_entries($atts)
      }
 ?>
      <div class="whe-edit" id="<?php echo $r_str; ?>">
-          <div class="table-container"></div>
-          <div class="form-container"></div>
+          <button style="display:none" class="reload-entries button button-primary button-large"><i class="fas fa-undo-alt"></i> Reload All Entries</button>
+          <div class="lds-ellipsis" style="display:none">
+               <div></div>
+               <div></div>
+               <div></div>
+               <div></div>
+
+          </div>
+          <div class="table-container" style="display:none"></div>
+          <div class="form-container" style="display:none"></div>
      </div>
 <?php
      wp_localize_script('whe-edit', 'ajax_var', array(
@@ -152,10 +225,11 @@ function shortcode_whe_edit_entries($atts)
           'form_id' => $atts['form_id'],
           'id' => $r_str
      ));
-
+     whe_enqueue_styles();
      wp_enqueue_script('whe-edit');
      wp_enqueue_style('whe-style-entries');
      whe_enqueue_scripts($atts['form_id']);
+     wp_enqueue_style('whe-style-entries', plugin_dir_url(__FILE__) . 'styles/entries.css', []);
 }
 
 function shortcode_whe_delete_entries()
