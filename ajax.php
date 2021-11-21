@@ -10,6 +10,18 @@ add_action("wp_ajax_nopriv_load_edit_entries", "whe_load_edit_entries");
 add_action("wp_ajax_whe_delete_entry", "whe_delete_entry");
 add_action("wp_ajax_nopriv_whe_delete_entry", "whe_delete_entry");
 
+function array_sort_by_column(&$arr, $col, $dir = SORT_ASC)
+{
+     $sort_col = array();
+     foreach ($arr as $key => $row) {
+          $sort_col[$key] = $row[$col];
+     }
+
+     array_multisort($sort_col, $dir, $arr);
+}
+
+
+
 function whe_delete_entry()
 {
      $nonce = sanitize_text_field($_POST['nonce']);
@@ -113,6 +125,10 @@ function load_entry_form()
           $abort         = true;
 
           return;
+     }
+
+     if ($entry->user_id != get_current_user_id()) {
+          wp_die("The entry selected doesn't belong to you");
      }
      $custom_wpforms = new Custom_WPForms_Form_Handler();
      // Find the form information.
@@ -538,8 +554,12 @@ function whe_load_edit_entries()
 
      // Loop through the form data so we can output form field names in
      // the table header.
-     foreach ($form_fields as $form_field) {
 
+     //sort array
+     array_sort_by_column($form_fields, 'label');
+
+     foreach ($form_fields as $form_field) {
+          
           // Output the form field name/label.
           echo '<th>';
           echo esc_html(sanitize_text_field($form_field['label']));
